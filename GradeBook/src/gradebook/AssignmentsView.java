@@ -10,6 +10,7 @@ import gradebookdata.Packet;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -92,6 +93,24 @@ public class AssignmentsView extends JPanel {
 			repaint();
 		}
 	}
+	
+	public void deleteAssignmentButtonClicked(){
+		if(assignmentsTable.getSelectedRow() < 0)
+			JOptionPane.showMessageDialog(this, "You must select an assignment to delete it", "Delete Assignment", JOptionPane.PLAIN_MESSAGE);
+		
+		else{
+			Assignment toDelete = assigns.getAssignment(assignmentsTable.getSelectedRow());
+			
+			String res = deleteAssignment(toDelete);
+			
+			if(!res.equals("Assignment was deleted"))
+				JOptionPane.showMessageDialog(this, res, "Delete Assignment", JOptionPane.PLAIN_MESSAGE);
+			else
+				dash.setUser(dash.user);
+			
+			courseSelected(course);
+		}
+	}
 
 	private void getAssigns(){
 		Client client;
@@ -159,6 +178,20 @@ public class AssignmentsView extends JPanel {
 				Integer.parseInt(temp[3]));
 		
 		return cur.getName();
+	}
+	
+	private String deleteAssignment(Assignment toDelete){
+		if(toDelete == null)
+			return "No Assignment Selected";
+		try{
+			Client delete = new Client(new Packet(202, toDelete.getID().toString()));
+			
+			if(delete.succeeded())
+				return "Assignment was deleted";
+		}catch(Exception e){
+		}
+		
+		return "An error occurred! Please try again";
 	}
 
 }

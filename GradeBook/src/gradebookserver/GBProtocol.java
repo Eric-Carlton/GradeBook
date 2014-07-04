@@ -438,7 +438,6 @@ public class GBProtocol {
 			Class.forName("com.mysql.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
 			System.out.println("JDBC missing!");
-			e.printStackTrace();
 			return;
 		}
 		connection = null;
@@ -446,11 +445,10 @@ public class GBProtocol {
 		try {
 			connection = DriverManager
 					.getConnection("jdbc:mysql://localhost:3306/grade_book",
-							"root", "password");
+							"gradebookclient", "gradebookclient");
 
 		} catch (SQLException e) {
 			System.out.println("Connection to DB Failed!");
-			e.printStackTrace();
 			return;
 		}
 
@@ -470,7 +468,7 @@ public class GBProtocol {
 	public boolean addUser(String first, String last, String user, String pass) {
 
 		PreparedStatement stmt;
-		String insert = "INSERT INTO USERS (first_name, last_name, user_name, password) VALUES (?,?,?,?)";
+		String insert = "INSERT INTO users (first_name, last_name, user_name, password) VALUES (?,?,?,?)";
 
 		// DB operations
 		try {
@@ -610,7 +608,7 @@ public class GBProtocol {
 	 */
 	private boolean addCourse(int user, String name, int weight) {
 		PreparedStatement coursestmt;
-		String insertCourse = "INSERT INTO COURSES (course_name, credit_hours, user_ID) VALUES (?,?,?)";
+		String insertCourse = "INSERT INTO courses (course_name, credit_hours, user_ID) VALUES (?,?,?)";
 
 		// DB operations
 		try {
@@ -774,7 +772,7 @@ public class GBProtocol {
 	 */
 	private boolean deleteCourse(int ID) {
 		PreparedStatement stmt;
-		String delete = "DELETE FROM COURSES WHERE course_ID = ?";
+		String delete = "DELETE FROM courses WHERE course_ID = ?";
 
 		try {
 			stmt = connection.prepareStatement(delete);
@@ -805,7 +803,7 @@ public class GBProtocol {
 	 */
 	private boolean addCategory(String name, int weight, int course_ID) {
 		PreparedStatement catStmt;
-		String insert = "INSERT INTO Categories (category_name, weight, course_ID) VALUES (?,?,?)";
+		String insert = "INSERT INTO categories (category_name, weight, course_ID) VALUES (?,?,?)";
 
 		// DB operations
 		try {
@@ -911,7 +909,7 @@ public class GBProtocol {
 			int course_ID) {
 
 		PreparedStatement stmt;
-		String insert = "INSERT INTO ASSIGNS (assign_name, score, category_ID, course_ID) VALUES (?,?,?,?)";
+		String insert = "INSERT INTO assigns (assign_name, score, category_ID, course_ID) VALUES (?,?,?,?)";
 
 		// DB operations
 		try {
@@ -1103,7 +1101,7 @@ public class GBProtocol {
 			return null;
 		}
 		try {
-			rs = stmt.executeQuery("Select * from CATEGORIES where course_ID = \""
+			rs = stmt.executeQuery("Select * from categories where course_ID = \""
 					+ course_ID + "\"");
 		} catch (SQLException e) {
 			System.out.println("Invalid Query!");
@@ -1149,7 +1147,7 @@ public class GBProtocol {
 	private boolean deleteAssign(int assign_ID)
 	{
 		PreparedStatement stmt;
-		String delete = "DELETE FROM ASSIGNS WHERE assign_ID = ?";
+		String delete = "DELETE FROM assigns WHERE assign_ID = ?";
 
 		try {
 			stmt = connection.prepareStatement(delete);
@@ -1175,7 +1173,7 @@ public class GBProtocol {
 	private boolean deleteCategory(int category_ID)
 	{
 		PreparedStatement stmt;
-		String delete = "DELETE FROM CATEGORIES WHERE category_ID = ?";
+		String delete = "DELETE FROM categories WHERE category_ID = ?";
 
 		try {
 			stmt = connection.prepareStatement(delete);

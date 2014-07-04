@@ -31,12 +31,12 @@ public class Dashboard extends JPanel implements ActionListener {
 	private static final long serialVersionUID = 6824683684567741313L;
 	CoursesView courses;
 	AssignmentsView assignments;
-	JLabel topMargin, leftMargin, rightMargin, center, leftBottom, leftBottomSeparator1,exitLeftMargin;
+	JLabel topMargin, leftMargin, rightMargin, center, leftBottom, leftBottomSeparator1, leftBottomSeparator2, exitLeftMargin;
 	private static TableLayout manager;
 	BufferedImage bgImage;
 	User user;
 
-	JButton exit, addCourse, deleteCourse, addAssignment, deleteAssignment;
+	JButton exit, addCourse, deleteCourse, addAssignment, deleteAssignment, addCategory, deleteCategory;
 
 	public Dashboard(GradeBookGUI gui){
 		super(manager);
@@ -88,12 +88,23 @@ public class Dashboard extends JPanel implements ActionListener {
 		deleteAssignment = new JButton("Delete Assignment");
 		deleteAssignment.setEnabled(false);
 		deleteAssignment.addActionListener(this);
+		
+		addCategory = new JButton("Add Category");
+		addCategory.setEnabled(false);
+		addCategory.addActionListener(this);
 
+		deleteCategory = new JButton("Delete Category");
+		deleteCategory.setEnabled(false);
+		deleteCategory.addActionListener(this);
+		
 		leftBottom = new JLabel(" ");
-		leftBottom.setPreferredSize(new Dimension(getWidth(), 1));
+		leftBottom.setPreferredSize(new Dimension(1, 1));
 
 		leftBottomSeparator1 = new JLabel(" ");
-		leftBottomSeparator1.setPreferredSize(new Dimension(getWidth(), 1));
+		leftBottomSeparator1.setPreferredSize(new Dimension(1, 1));
+		
+		leftBottomSeparator2 = new JLabel(" ");
+		leftBottomSeparator2.setPreferredSize(new Dimension(1, 1));
 
 		//courses.setMinimumSize(new Dimension(gui.getWidth()/3, gui.getHeight()-exit.getHeight()));
 
@@ -113,6 +124,9 @@ public class Dashboard extends JPanel implements ActionListener {
 		add(leftBottomSeparator1, "L3W");
 		add(addAssignment, "LR");
 		add(deleteAssignment, "LR.");
+		add(leftBottomSeparator2, "L6W");
+		add(addCategory, "LR");
+		add(deleteCategory,"LR.");
 		add(exitLeftMargin,"LR5W");
 		add(exit, "LR2W");
 
@@ -137,6 +151,8 @@ public class Dashboard extends JPanel implements ActionListener {
 			assignments.deleteAssignmentButtonClicked();
 		else if(ev.getSource() == addAssignment)
 			addAssignmentBtnClicked();
+		else if(ev.getSource() == addCategory)
+			addCategoryBtnClicked();
 	}
 
 	public void setUser(User curUser){
@@ -149,6 +165,7 @@ public class Dashboard extends JPanel implements ActionListener {
 		assignments.courseSelected(course);
 		addAssignment.setEnabled(true);
 		deleteAssignment.setEnabled(true);
+		addCategory.setEnabled(true);
 	}
 
 	private void addCourseBtnClicked(){
@@ -168,7 +185,7 @@ public class Dashboard extends JPanel implements ActionListener {
 		int result = JOptionPane.showConfirmDialog(null, components, "Add Course", JOptionPane.OK_CANCEL_OPTION);
 
 		if(result == JOptionPane.OK_OPTION){
-			if(courseNameTxt.getText().trim().length() != 0 && creditHoursTxt.getText().trim().length() != 0)
+			if(courseNameTxt.getText().trim().length() > 0 && creditHoursTxt.getText().trim().length() > 0)
 				createCourse(courseNameTxt.getText().trim(), creditHoursTxt.getText().trim());
 			else
 				JOptionPane.showMessageDialog(this, "All information required to add a course","Add Course Error", JOptionPane.ERROR_MESSAGE);
@@ -202,7 +219,7 @@ public class Dashboard extends JPanel implements ActionListener {
 
 		int result = JOptionPane.showConfirmDialog(this, components, "Add Assignment", JOptionPane.OK_CANCEL_OPTION);
 		if(result == JOptionPane.OK_OPTION){
-			if(assignmentNameTxt.getText().trim().length() != 0 && assignmentScoreTxt.getText().trim().length() != 0){
+			if(assignmentNameTxt.getText().trim().length() > 0 && assignmentScoreTxt.getText().trim().length() > 0){
 				Double score;
 				int scoreInt = 0;
 				
@@ -289,5 +306,45 @@ public class Dashboard extends JPanel implements ActionListener {
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this, "Oops! An error occurred! Please try again.", "Couldn't Add Course", JOptionPane.ERROR_MESSAGE);
 		}
+	}
+	
+	private void addCategoryBtnClicked(){
+		JLabel categoryNameLbl = new JLabel("Category Name: ");
+		JLabel categoryWeightLbl = new JLabel("Category Weight (% of final grade) : ");
+		
+		JTextField categoryNameTxt = new JTextField();
+		JTextField categoryWeightTxt = new JTextField();
+		
+		Object[] components = new Object[4];
+		components[0] = categoryNameLbl;
+		components[1] = categoryNameTxt;
+		components[2] = categoryWeightLbl;
+		components[3] = categoryWeightTxt;
+		
+		int result = JOptionPane.showConfirmDialog(this, components, "Add Assignment", JOptionPane.OK_CANCEL_OPTION);
+		if(result == JOptionPane.OK_OPTION){
+			if(categoryNameTxt.getText().trim().length() > 0 && categoryWeightTxt.getText().trim().length() > 0){
+				int weight = 0;
+				try{
+					weight = Integer.parseInt(categoryWeightTxt.getText().trim());
+					if(weight < 0 || weight > 100)
+						JOptionPane.showMessageDialog(this, "Weight must be between 0 and 100", "Add Category Error", JOptionPane.ERROR_MESSAGE);
+					else
+						createCategory(categoryNameTxt.getText().trim(), weight, assignments.course);
+				}catch(Exception e){
+					JOptionPane.showMessageDialog(this, "Weight must be a whole number", "Add Category Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		}
+	}
+	
+	private void createCategory(String name, int weight, Course course){
+		try {
+			Client client = new Client(new Packet(300, name+";"+weight+";"+course.getID().toString()));
+			if(!client.succeeded())
+				JOptionPane.showMessageDialog(this, client.getResponse().getData(), "Couldn't Add Category", JOptionPane.ERROR_MESSAGE);
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(this, "Oops! An error occurred! Please try again.", "Couldn't Add Category", JOptionPane.ERROR_MESSAGE);
+		} 
 	}
 }

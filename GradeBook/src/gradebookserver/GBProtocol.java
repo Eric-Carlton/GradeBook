@@ -445,10 +445,10 @@ public class GBProtocol {
 		try {
 			connection = DriverManager
 					.getConnection("jdbc:mysql://localhost:3306/grade_book",
-							"gradebookclient", "gradebookclient");
+							"root", "password");
 
 		} catch (SQLException e) {
-			System.out.println("Connection to DB Failed!");
+			System.out.println(e);
 			return;
 		}
 

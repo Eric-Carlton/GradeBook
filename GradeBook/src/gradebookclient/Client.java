@@ -22,7 +22,7 @@ public class Client {
 	private Packet toSend = null;
 
 	private static final int PORT = 4701;
-	private static final String HOST = "54.191.39.190";
+	private static final String HOST = "127.0.0.1";
 
 	/**
 	 * Create a new Client
